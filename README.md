@@ -1,29 +1,73 @@
-# Fluent::Plugin::Config::Expander
+# fluent-plugin-config-expander
 
-TODO: Write a gem description
+## ConfigExpanderInput, ConfigExpanderOutput
 
-## Installation
+ConfigExpanderInput and ConfigExpanderOutput plugins provide simple configuration template to write items repeatedly.
+In <config> section, you can write actual configuration for actual input/output plugin, with special directives for loop controls.
 
-Add this line to your application's Gemfile:
+## Configuration
 
-    gem 'fluent-plugin-config-expander'
+For both of input and output (for <source> and <match>), you can use 'config_expander' and its 'for' directive like below:
 
-And then execute:
+    <match example.**>
+      type config_expander
+      <config>
+        type forward
+        flush_interval 30s
+        <for x in 01 02 03>
+          <server>
+            host worker__x__.local
+            port 24224
+          </server>
+        </for>
+      </config>
+    </match>
 
-    $ bundle
+Configuration above is equal to below:
 
-Or install it yourself as:
+    <match example.**>
+      type forward
+      flush_interval 30s
+      <server>
+        host worker01.local
+        port 24224
+      </server>
+      <server>
+        host worker02.local
+        port 24224
+      </server>
+      <server>
+        host worker03.local
+        port 24224
+      </server>
+    </match>
 
-    $ gem install fluent-plugin-config-expander
+Nested 'for' directive is valid:
 
-## Usage
+    <match example.**>
+      type config_expander
+      <config>
+        type forward
+        flush_interval 30s
+        <for x in 01 02 03>
+          <for p in 24221 24222 24223 24224
+            <server>
+              host worker__x__.local
+              port __p__
+            </server>
+          </for>
+        </for>
+      </config>
+    </match>
 
-TODO: Write usage instructions here
+## TODO
 
-## Contributing
+* more tests
+* patches welcome!
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+## Copyright
+
+* Copyright (c) 2012- TAGOMORI Satoshi (tagomoris)
+* License
+  * Apache License, Version 2.0
+
