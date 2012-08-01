@@ -15,17 +15,17 @@ module Fluent::Config::Expander
         unless e.arg =~ /^([a-zA-Z0-9]+) in (.+)$/
           raise Fluent::ConfigError, "invalid for tag syntax: <for NAME in ARG1 ARG2 ...>"
         end
-        vname = $1
-        vargs = $2.split(/ +/)
+        vname = '__' + $1 + '__'
+        vargs = $2.split(/ +/).select{|v| v.size > 0}
         vargs.each do |v|
           expanded = expand(e, mapping.merge({vname => v}))
           attrs.update(expanded)
-          elements += expanded.elements
+          elements += expanded.elements.map{|xe| expand(xe, mapping)}
         end
       else
         elements.push(expand(e, mapping))
       end
     end
-    Element.new(name, arg, attrs, elements, [])
+    Fluent::Config::Element.new(name, arg, attrs, elements, [])
   end
 end
