@@ -5,6 +5,11 @@ class Fluent::ConfigExpanderOutput < Fluent::Output
 
   attr_accessor :plugin
 
+  def mark_used(conf)
+    conf.used = conf.keys
+    conf.elements.each{|e| mark_used(e)}
+  end
+
   def expand_config(conf)
     ex = Fluent::Config::Expander.expand(conf, {})
     ex.name = ''
@@ -22,6 +27,8 @@ class Fluent::ConfigExpanderOutput < Fluent::Output
     ex = expand_config(configs.first)
     @plugin = Fluent::Plugin.new_output(ex['type'])
     @plugin.configure(ex)
+
+    mark_used(configs.first)
   end
 
   def start
