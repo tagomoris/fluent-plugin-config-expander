@@ -42,6 +42,22 @@ Configuration above is equal to below:
       </server>
     </match>
 
+As placeholder, you can use '${varname}' style:
+
+    <match example.**>
+      type config_expander
+      <config>
+        type forward
+        flush_interval 30s
+        <for node in 01 02 03>
+          <server>
+            host worker${node}.local
+            port 24224
+          </server>
+        </for>
+      </config>
+    </match>
+
 Nested 'for' directive is valid:
 
     <match example.**>

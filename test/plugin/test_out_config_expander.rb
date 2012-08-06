@@ -39,6 +39,28 @@ type config_expander
     assert_equal true, d.instance.plugin.stopped
   end
 
+  CONFIG2 = %[
+type config_expander
+hostname testing.node.local
+<config>
+  type config_expander_test
+  tag baz
+  <node>
+    attr1 ${hostname}
+    attr2 ${HOSTNAME}
+    attr3 __hostname__
+    attr4 __HOSTNAME__
+  </node>
+]
+  def test_configure_hostname
+    d = create_driver CONFIG2
+    assert_equal 1, d.instance.plugin.nodes.size
+    assert_equal 'testing.node.local', d.instance.plugin.nodes.first['attr1']
+    assert_equal 'testing.node.local', d.instance.plugin.nodes.first['attr2']
+    assert_equal 'testing.node.local', d.instance.plugin.nodes.first['attr3']
+    assert_equal 'testing.node.local', d.instance.plugin.nodes.first['attr4']
+  end
+
   def test_emit
     d = create_driver
     d.run do

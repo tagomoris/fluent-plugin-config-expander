@@ -3,6 +3,7 @@ require_relative 'expander'
 class Fluent::ConfigExpanderInput < Fluent::Input
   Fluent::Plugin.register_input('config_expander', self)
 
+  config_param :hostname, :string, :default => `hostname`.chomp
   attr_accessor :plugin
 
   def mark_used(conf)
@@ -10,8 +11,12 @@ class Fluent::ConfigExpanderInput < Fluent::Input
     conf.elements.each{|e| mark_used(e)}
   end
 
+  def builtin_mapping
+    {'__hostname__' => @hostname, '__HOSTNAME__' => @hostname, '${hostname}' => @hostname, '${HOSTNAME}' => @hostname}
+  end
+
   def expand_config(conf)
-    ex = Fluent::Config::Expander.expand(conf, {})
+    ex = Fluent::Config::Expander.expand(conf, builtin_mapping())
     ex.name = ''
     ex.arg = ''
     ex
