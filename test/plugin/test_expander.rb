@@ -13,6 +13,7 @@ class ConfigExpanderTest < Test::Unit::TestCase
     assert_equal "foofoo", @m.replace("foobar", {'bar' => 'foo'})
     assert_equal "foobar", @m.replace("foobar", {'hoge' => 'moge'})
     assert_equal "xxbar", @m.replace("foofoobar", {'foo' => 'x'})
+    assert_equal "xxy", @m.replace("foofoobar", {'foo' => 'x', 'bar' => 'y'})
   end
 
   def test_expand
@@ -128,5 +129,69 @@ EOL
 </config>
 EOL
     assert_equal exconf3, @m.expand(conf3, {}).to_s
+
+    nonexconf4 = <<EOL
+<config>
+  type forward
+  flush_interval 1s
+  <for nodenum in 01>
+    <for portnum in 24221 24222 24223 24224>
+      <server>
+        host node__nodenum__.local
+        port ${portnum}
+      </server>
+    </for>
+  </for>
+  <for nodenum in 02>
+    <for portnum in 24221 24222 24223 24224>
+      <server>
+        host node${nodenum}.local
+        port __portnum__
+      </server>
+    </for>
+  </for>
+</config>
+EOL
+    conf4 = Fluent::Config.parse(nonexconf4, 'hoge').elements.first
+    assert_equal nonexconf4, conf4.to_s
+    exconf4 = <<EOL
+<config>
+  type forward
+  flush_interval 1s
+  <server>
+    host node01.local
+    port 24221
+  </server>
+  <server>
+    host node01.local
+    port 24222
+  </server>
+  <server>
+    host node01.local
+    port 24223
+  </server>
+  <server>
+    host node01.local
+    port 24224
+  </server>
+  <server>
+    host node02.local
+    port 24221
+  </server>
+  <server>
+    host node02.local
+    port 24222
+  </server>
+  <server>
+    host node02.local
+    port 24223
+  </server>
+  <server>
+    host node02.local
+    port 24224
+  </server>
+</config>
+EOL
+    assert_equal exconf4, @m.expand(conf4, {}).to_s
   end
 end

@@ -2,7 +2,7 @@ require 'fluent/config'
 
 module Fluent::Config::Expander
   def self.replace(str, mapping)
-    mapping.reduce(str){|r,p| str.gsub(p[0], p[1])}
+    mapping.reduce(str){|r,p| r.gsub(p[0], p[1])}
   end
 
   def self.expand(element, mapping)
@@ -15,10 +15,13 @@ module Fluent::Config::Expander
         unless e.arg =~ /^([a-zA-Z0-9]+) in (.+)$/
           raise Fluent::ConfigError, "invalid for tag syntax: <for NAME in ARG1 ARG2 ...>"
         end
-        vname = '__' + $1 + '__'
+        vkey = $1.dup
         vargs = $2.split(/ +/).select{|v| v.size > 0}
+
+        vname = '__' + vkey + '__'
+        vname2 = '${' + vkey + '}'
         vargs.each do |v|
-          expanded = expand(e, mapping.merge({vname => v}))
+          expanded = expand(e, mapping.merge({vname => v, vname2 => v}))
           attrs.update(expanded)
           elements += expanded.elements.map{|xe| expand(xe, mapping)}
         end
