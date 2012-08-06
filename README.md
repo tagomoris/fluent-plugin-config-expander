@@ -5,6 +5,9 @@
 ConfigExpanderInput and ConfigExpanderOutput plugins provide simple configuration template to write items repeatedly.
 In <config> section, you can write actual configuration for actual input/output plugin, with special directives for loop controls.
 
+And also supports built-in placeholders below:
+ * hostname (ex: \_\_HOSTNAME\_\_, \_\_hostname\_\_, ${hostname}, ${HOSTNAME})
+
 ## Configuration
 
 For both of input and output (for <source> and <match>), you can use 'config_expander' and its 'for' directive like below:
@@ -75,6 +78,18 @@ Nested 'for' directive is valid:
         </for>
       </config>
     </match>
+
+Set hostname into tag in 'tail' input plugin:
+
+    <source>
+      type config_expander
+      <config>
+        type tail
+        format /..../
+        path /var/log/access.log
+        tag access.log.${hostname}
+      </config>
+    </source>
 
 ## TODO
 
