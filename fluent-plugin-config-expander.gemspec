@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-config-expander"
-  gem.version       = "0.1.1"
+  gem.version       = "0.1.2"
   gem.authors       = ["TAGOMORI Satoshi"]
   gem.email         = ["tagomoris@gmail.com"]
   gem.description   = %q{This plugin provides directives for loop extraction}
@@ -15,6 +15,5 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_development_dependency "rake"
-  gem.add_development_dependency "fluentd"
   gem.add_runtime_dependency "fluentd"
 end
