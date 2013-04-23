@@ -1,6 +1,6 @@
 require_relative 'expander'
 
-class Fluent::ConfigExpanderOutput < Fluent::Output
+class Fluent::ConfigExpanderOutput < Fluent::MultiOutput
   Fluent::Plugin.register_output('config_expander', self)
 
   config_param :hostname, :string, :default => `hostname`.chomp
@@ -22,6 +22,8 @@ class Fluent::ConfigExpanderOutput < Fluent::Output
     ex
   end
 
+  attr_reader :outputs
+
   def configure(conf)
     super
 
@@ -32,6 +34,8 @@ class Fluent::ConfigExpanderOutput < Fluent::Output
     ex = expand_config(configs.first)
     @plugin = Fluent::Plugin.new_output(ex['type'])
     @plugin.configure(ex)
+
+    @outputs = [@plugin]
 
     mark_used(configs.first)
   end
