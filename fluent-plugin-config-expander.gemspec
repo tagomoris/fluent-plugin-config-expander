@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-config-expander"
-  gem.version       = "0.1.2"
+  gem.version       = "0.1.3"
   gem.authors       = ["TAGOMORI Satoshi"]
   gem.email         = ["tagomoris@gmail.com"]
   gem.description   = %q{This plugin provides directives for loop extraction}
