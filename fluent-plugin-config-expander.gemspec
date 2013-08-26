@@ -8,6 +8,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{This plugin provides directives for loop extraction}
   gem.summary       = %q{Fluentd plugin to serve some DSL directives in configuration}
   gem.homepage      = "https://github.com/tagomoris/fluent-plugin-config-expander"
+  gem.license       = "APLv2"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
