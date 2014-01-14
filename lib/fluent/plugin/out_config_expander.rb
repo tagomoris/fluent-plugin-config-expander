@@ -7,7 +7,7 @@ class Fluent::ConfigExpanderOutput < Fluent::MultiOutput
   attr_accessor :plugin
 
   def mark_used(conf)
-    conf.used = conf.keys
+    conf.keys.each {|key| conf[key] } # to suppress unread configuration warning
     conf.elements.each{|e| mark_used(e)}
   end
 
