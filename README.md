@@ -1,4 +1,6 @@
-# fluent-plugin-config-expander, a plugin for [Fluentd](http://fluentd.org)
+# fluent-plugin-config-expander
+
+This is a plugin for [Fluentd](http://fluentd.org).
 
 ## ConfigExpanderInput, ConfigExpanderOutput
 
