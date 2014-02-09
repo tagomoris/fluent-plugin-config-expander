@@ -1,5 +1,7 @@
 # fluent-plugin-config-expander
 
+This is a plugin for [Fluentd](http://fluentd.org).
+
 ## ConfigExpanderInput, ConfigExpanderOutput
 
 ConfigExpanderInput and ConfigExpanderOutput plugins provide simple configuration template to write items repeatedly.
