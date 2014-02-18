@@ -3,6 +3,11 @@ require_relative 'expander'
 class Fluent::ConfigExpanderInput < Fluent::Input
   Fluent::Plugin.register_input('config_expander', self)
 
+  # Define `log` method for v0.10.42 or earlier
+  unless method_defined?(:log)
+    define_method("log") { $log }
+  end
+
   config_param :hostname, :string, :default => `hostname`.chomp
   attr_accessor :plugin
 
