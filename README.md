@@ -15,9 +15,9 @@ And also supports built-in placeholders below:
 For both of input and output (for <source> and <match>), you can use 'config_expander' and its 'for' directive like below:
 
     <match example.**>
-      type config_expander
+      @type config_expander
       <config>
-        type forward
+        @type forward
         flush_interval 30s
         <for x in 01 02 03>
           <server>
@@ -31,7 +31,7 @@ For both of input and output (for <source> and <match>), you can use 'config_exp
 Configuration above is equal to below:
 
     <match example.**>
-      type forward
+      @type forward
       flush_interval 30s
       <server>
         host worker01.local
@@ -50,9 +50,9 @@ Configuration above is equal to below:
 As placeholder, you can use '${varname}' style:
 
     <match example.**>
-      type config_expander
+      @type config_expander
       <config>
-        type forward
+        @type forward
         flush_interval 30s
         <for node in 01 02 03>
           <server>
@@ -66,9 +66,9 @@ As placeholder, you can use '${varname}' style:
 Nested 'for' directive is valid:
 
     <match example.**>
-      type config_expander
+      @type config_expander
       <config>
-        type forward
+        @type forward
         flush_interval 30s
         <for x in 01 02 03>
           <for p in 24221 24222 24223 24224
@@ -84,9 +84,9 @@ Nested 'for' directive is valid:
 Set hostname into tag in 'tail' input plugin:
 
     <source>
-      type config_expander
+      @type config_expander
       <config>
-        type tail
+        @type tail
         format /..../
         path /var/log/access.log
         tag access.log.${hostname}
