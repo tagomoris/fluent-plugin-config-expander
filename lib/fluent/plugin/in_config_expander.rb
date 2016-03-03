@@ -35,7 +35,8 @@ class Fluent::ConfigExpanderInput < Fluent::Input
       raise Fluent::ConfigError, "config_expander needs just one <config> ... </config> section"
     end
     ex = expand_config(configs.first)
-    @plugin = Fluent::Plugin.new_input(ex['type'])
+    type = ex['@type'] || ex['type']
+    @plugin = Fluent::Plugin.new_input(type)
     @plugin.configure(ex)
 
     mark_used(configs.first)

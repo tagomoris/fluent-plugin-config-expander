@@ -37,7 +37,8 @@ class Fluent::ConfigExpanderOutput < Fluent::MultiOutput
       raise Fluent::ConfigError, "config_expander needs just one <config> ... </config> section"
     end
     ex = expand_config(configs.first)
-    @plugin = Fluent::Plugin.new_output(ex['type'])
+    type = ex['@type'] || ex['type']
+    @plugin = Fluent::Plugin.new_output(type)
     @plugin.configure(ex)
 
     @outputs = [@plugin]
