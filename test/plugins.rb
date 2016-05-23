@@ -49,9 +49,14 @@ class Fluent::ConfigExpanderTestOutput < Fluent::Output
     @stopped = true
   end
 
+  # Define `router` method of v0.12 to support v0.10 or earlier
+  unless method_defined?(:router)
+    define_method("router") { Fluent::Engine }
+  end
+
   def emit(tag, es, chain)
     es.each do |time, record|
-      Fluent::Engine.emit(@tag, time, record.merge({'over' => 'expander'}))
+      router.emit(@tag, time, record.merge({'over' => 'expander'}))
     end
     chain.next
   end
