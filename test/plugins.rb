@@ -51,7 +51,7 @@ class Fluent::ConfigExpanderTestOutput < Fluent::Output
 
   def emit(tag, es, chain)
     es.each do |time, record|
-      Fluent::Engine.emit(@tag, time, record.merge({'over' => 'expander'}))
+      router.emit(@tag, time, record.merge({'over' => 'expander'}))
     end
     chain.next
   end
