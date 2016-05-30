@@ -78,7 +78,7 @@ EOL
 <config>
   type forward
   flush_interval 1s
-  <for nodenum in 01 02 >
+  <for nodenum in 01 02>
     <for portnum in 24221 24222 24223 24224>
       <server>
         host node__nodenum__.local
