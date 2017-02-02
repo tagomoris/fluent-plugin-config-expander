@@ -55,6 +55,10 @@ class Fluent::ConfigExpanderOutput < Fluent::MultiOutput
   end
 
   def emit(tag, es, chain)
-    @plugin.emit(tag, es, chain)
+    if @plugin.respond_to?(:emit_events)
+      @plugin.emit_events(tag, es)
+    else
+      @plugin.emit(tag, es, chain)
+    end
   end
 end
