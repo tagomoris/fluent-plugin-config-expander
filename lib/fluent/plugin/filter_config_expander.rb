@@ -38,13 +38,19 @@ class Fluent::Plugin::ConfigExpanderFilter < Fluent::Plugin::Filter
     @plugin.configure(ex)
     mark_used(@config_config.corresponding_config_element)
 
-    self.extend SingleForwardable
-    override_methods = self.methods + @plugin.methods - SingleForwardable.instance_methods - Object.instance_methods
-    override_methods.uniq!
-    def_delegators(:@plugin, *override_methods)
-  end
+    # hack for https://bugs.ruby-lang.org/issues/12478 in ruby 2.3 or earlier
+    mojule = Module.new do
+      def method_defined?(accessor)
+        methods.include?(accessor.to_sym)
+      end
+      def private_method_defined?(accessor)
+        private_methods.include?(accessor.to_sym)
+      end
+    end
+    self.extend(mojule) unless self.class === Module
 
-  def method_missing(name, *args, &block)
-    @plugin.__send__(name, *args, &block)
+    self.extend SingleForwardable
+    override_methods = @plugin.methods - SingleForwardable.instance_methods - Object.instance_methods
+    def_single_delegators(:@plugin, *override_methods)
   end
 end
