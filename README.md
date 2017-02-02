@@ -5,14 +5,14 @@ This is a plugin for [Fluentd](http://fluentd.org).
 ## ConfigExpanderInput, ConfigExpanderOutput
 
 ConfigExpanderInput, ConfigExpanderFilter and ConfigExpanderOutput plugins provide simple configuration template to write items repeatedly.
-In <config> section, you can write actual configuration for actual input/filter/output plugin, with special directives for loop controls.
+In `<config>` section, you can write actual configuration for actual input/filter/output plugin, with special directives for loop controls.
 
 And also supports built-in placeholders below:
  * hostname (ex: \_\_HOSTNAME\_\_, \_\_hostname\_\_, ${hostname}, ${HOSTNAME})
 
 ## Configuration
 
-For all of input, filter and output (for <source>, <filter> and <match>), you can use 'config_expander' and its 'for' directive like below:
+For all of input, filter and output (for `<source>`, `<filter>` and `<match>`), you can use 'config_expander' and its 'for' directive like below:
 
     <match example.**>
       @type config_expander
