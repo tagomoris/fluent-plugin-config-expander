@@ -2,13 +2,13 @@ require 'fluent/config'
 
 module Fluent::Config::Expander
   def self.replace(str, mapping)
-    mapping.reduce(str){|r,p| r.gsub(p[0], p[1])}
+    mapping.reduce(str){|r, pair| r.gsub(pair[0], pair[1])}
   end
 
   def self.expand(element, mapping)
     name = replace(element.name, mapping)
     arg = replace(element.arg, mapping)
-    attrs = element.reduce({}){|r,p| r[replace(p.first, mapping)] = replace(p.last, mapping); r}
+    attrs = element.reduce({}){|r, pair| r[replace(pair[0], mapping)] = replace(pair[1], mapping); r}
     elements = []
     element.elements.each do |e|
       if e.name == 'for'
