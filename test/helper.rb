@@ -12,7 +12,6 @@ require 'test/unit'
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'fluent/test'
-require 'fluent/input'
 unless ENV.has_key?('VERBOSE')
   nulllogger = Object.new
   nulllogger.instance_eval {|obj|
@@ -23,7 +22,13 @@ unless ENV.has_key?('VERBOSE')
   $log = nulllogger
 end
 
+require 'fluent/test/driver/input'
+require 'fluent/test/driver/filter'
+require 'fluent/test/driver/base_owner' # for output (BareOutput)
+require 'fluent/test/driver/event_feeder'
+
 require 'fluent/plugin/in_config_expander'
+require 'fluent/plugin/filter_config_expander'
 require 'fluent/plugin/out_config_expander'
 
 class Test::Unit::TestCase

@@ -1,17 +1,19 @@
-class Fluent::ConfigExpanderTestInput < Fluent::Input
+require 'fluent/plugin/input'
+
+class Fluent::Plugin::ConfigExpanderTestInput < Fluent::Plugin::Input
   Fluent::Plugin.register_input('config_expander_test', self)
 
   config_param :tag, :string
-  attr_accessor :nodes
+  config_section :node, param_name: :nodes, multi: true do
+    config_param :attr1, :string, default: nil
+    config_param :attr2, :string, default: nil
+    config_param :attr3, :string, default: nil
+    config_param :attr4, :string, default: nil
+  end
   attr_accessor :started, :stopped
 
   def configure(conf)
     super
-    @nodes = []
-    conf.elements.each do |e|
-      next if e.name != 'node'
-      @nodes << {}.merge(e)
-    end
     @started = @stopped = false
   end
   def start
@@ -19,67 +21,29 @@ class Fluent::ConfigExpanderTestInput < Fluent::Input
     @started = true
   end
   def shutdown
-    super
     @stopped = true
-  end
-end
-
-class Fluent::ConfigExpanderTestOutput < Fluent::Output
-  Fluent::Plugin.register_output('config_expander_test', self)
-
-  config_param :tag, :string
-  attr_accessor :nodes
-  attr_accessor :started, :stopped
-
-  def configure(conf)
     super
-    @nodes = []
-    conf.elements.each do |e|
-      next if e.name != 'node'
-      @nodes << {}.merge(e)
-    end
-    @started = @stopped = false
-  end
-  def start
-    super
-    @started = true
-  end
-  def shutdown
-    super
-    @stopped = true
-  end
-
-  # Define `router` method of v0.12 to support v0.10 or earlier
-  unless method_defined?(:router)
-    define_method("router") { Fluent::Engine }
-  end
-
-  def emit(tag, es, chain)
-    es.each do |time, record|
-      router.emit(@tag, time, record.merge({'over' => 'expander'}))
-    end
-    chain.next
   end
 end
 
 require 'fluent/plugin/output'
 
-class Fluent::ConfigExpanderV14TestOutput < Fluent::Output
-  Fluent::Plugin.register_output('config_expander_test_v14', self)
+class Fluent::Plugin::ConfigExpanderTestOutput < Fluent::Plugin::Output
+  Fluent::Plugin.register_output('config_expander_test', self)
 
   helpers :event_emitter
 
   config_param :tag, :string
-  attr_accessor :nodes
+  config_section :node, param_name: :nodes, multi: true do
+    config_param :attr1, :string, default: nil
+    config_param :attr2, :string, default: nil
+    config_param :attr3, :string, default: nil
+    config_param :attr4, :string, default: nil
+  end
   attr_accessor :started, :stopped
 
   def configure(conf)
     super
-    @nodes = []
-    conf.elements.each do |e|
-      next if e.name != 'node'
-      @nodes << {}.merge(e)
-    end
     @started = @stopped = false
   end
   def start
@@ -87,8 +51,8 @@ class Fluent::ConfigExpanderV14TestOutput < Fluent::Output
     @started = true
   end
   def shutdown
-    super
     @stopped = true
+    super
   end
 
   def process(tag, es)
