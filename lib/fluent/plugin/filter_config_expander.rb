@@ -1,13 +1,11 @@
-require 'fluent/plugin/bare_output'
+require 'fluent/plugin/filter'
 
 require_relative 'expander'
 require 'forwardable'
 require 'socket'
 
-class Fluent::Plugin::ConfigExpanderOutput < Fluent::Plugin::BareOutput
-  Fluent::Plugin.register_output('config_expander', self)
-
-  helpers :event_emitter
+class Fluent::Plugin::ConfigExpanderFilter < Fluent::Plugin::Filter
+  Fluent::Plugin.register_input('config_expander', self)
 
   config_param :hostname, :string, default: Socket.gethostname
   config_section :config, multi: false, required: true, param_name: :config_config do
@@ -25,7 +23,7 @@ class Fluent::Plugin::ConfigExpanderOutput < Fluent::Plugin::BareOutput
 
   def expand_config(conf)
     ex = Fluent::Config::Expander.expand(conf, builtin_mapping())
-    ex.name = 'match' # name/arg will be ignored by Plugin#configure, but anyway
+    ex.name = 'filter' # name/arg will be ignored by Plugin#configure, but anyway
     ex.arg = conf.arg
     ex
   end
@@ -35,7 +33,7 @@ class Fluent::Plugin::ConfigExpanderOutput < Fluent::Plugin::BareOutput
 
     ex = expand_config(@config_config.corresponding_config_element)
     type = ex['@type']
-    @plugin = Fluent::Plugin.new_output(type)
+    @plugin = Fluent::Plugin.new_input(type)
     @plugin.context_router = self.event_emitter_router(conf['@label'])
     @plugin.configure(ex)
     mark_used(@config_config.corresponding_config_element)

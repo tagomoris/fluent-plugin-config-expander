@@ -1,15 +1,16 @@
-require_relative 'expander'
+require 'fluent/plugin/input'
 
-class Fluent::ConfigExpanderInput < Fluent::Input
+require_relative 'expander'
+require 'forwardable'
+require 'socket'
+
+class Fluent::Plugin::ConfigExpanderInput < Fluent::Plugin::Input
   Fluent::Plugin.register_input('config_expander', self)
 
-  # Define `log` method for v0.10.42 or earlier
-  unless method_defined?(:log)
-    define_method("log") { $log }
+  config_param :hostname, :string, default: Socket.gethostname
+  config_section :config, multi: false, required: true, param_name: :config_config do
+    # to raise configuration error for missing section
   end
-
-  config_param :hostname, :string, :default => `hostname`.chomp
-  attr_accessor :plugin
 
   def mark_used(conf)
     conf.keys.each {|key| conf[key] } # to suppress unread configuration warning
@@ -22,31 +23,28 @@ class Fluent::ConfigExpanderInput < Fluent::Input
 
   def expand_config(conf)
     ex = Fluent::Config::Expander.expand(conf, builtin_mapping())
-    ex.name = ''
+    ex.name = 'source' # name/arg will be ignored by Plugin#configure, but anyway
     ex.arg = ''
     ex
   end
 
   def configure(conf)
     super
-    
-    configs = conf.elements.select{|e| e.name == 'config'}
-    if configs.size != 1
-      raise Fluent::ConfigError, "config_expander needs just one <config> ... </config> section"
-    end
-    ex = expand_config(configs.first)
-    type = ex['@type'] || ex['type']
+
+    ex = expand_config(@config_config.corresponding_config_element)
+    type = ex['@type']
     @plugin = Fluent::Plugin.new_input(type)
+    @plugin.context_router = self.event_emitter_router(conf['@label'])
     @plugin.configure(ex)
+    mark_used(@config_config.corresponding_config_element)
 
-    mark_used(configs.first)
+    self.extend SingleForwardable
+    override_methods = self.methods + @plugin.methods - SingleForwardable.instance_methods - Object.instance_methods
+    override_methods.uniq!
+    def_delegators(:@plugin, *override_methods)
   end
 
-  def start
-    @plugin.start
-  end
-
-  def shutdown
-    @plugin.shutdown
+  def method_missing(name, *args, &block)
+    @plugin.__send__(name, *args, &block)
   end
 end
