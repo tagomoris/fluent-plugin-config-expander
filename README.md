@@ -2,6 +2,13 @@
 
 This is a plugin for [Fluentd](http://fluentd.org).
 
+## Requirements
+
+| fluent-plugin-config-expander | fluentd    | ruby   |
+|-------------------------------|------------|--------|
+| >= 1.0.0                      | >= v0.14.0 | >= 2.1 |
+| <  1.0.0                      | <  v0.14.0 | >= 1.9 |
+
 ## ConfigExpanderInput, ConfigExpanderOutput
 
 ConfigExpanderInput, ConfigExpanderFilter and ConfigExpanderOutput plugins provide simple configuration template to write items repeatedly.
