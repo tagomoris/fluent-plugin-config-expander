@@ -5,7 +5,7 @@ require 'forwardable'
 require 'socket'
 
 class Fluent::Plugin::ConfigExpanderFilter < Fluent::Plugin::Filter
-  Fluent::Plugin.register_input('config_expander', self)
+  Fluent::Plugin.register_filter('config_expander', self)
 
   config_param :hostname, :string, default: Socket.gethostname
   config_section :config, multi: false, required: true, param_name: :config_config do
@@ -33,7 +33,7 @@ class Fluent::Plugin::ConfigExpanderFilter < Fluent::Plugin::Filter
 
     ex = expand_config(@config_config.corresponding_config_element)
     type = ex['@type']
-    @plugin = Fluent::Plugin.new_input(type)
+    @plugin = Fluent::Plugin.new_filter(type)
     @plugin.context_router = self.event_emitter_router(conf['@label'])
     @plugin.configure(ex)
     mark_used(@config_config.corresponding_config_element)
@@ -52,5 +52,11 @@ class Fluent::Plugin::ConfigExpanderFilter < Fluent::Plugin::Filter
     self.extend SingleForwardable
     override_methods = @plugin.methods - SingleForwardable.instance_methods - Object.instance_methods
     def_single_delegators(:@plugin, *override_methods)
+  end
+
+  def filter(tag, time, record)
+    # empty implement to avoid the exception when initializing (Filter#has_filter_with_time?)
+    # This will be override by ConfigExpanderFilter#configure
+    record
   end
 end
