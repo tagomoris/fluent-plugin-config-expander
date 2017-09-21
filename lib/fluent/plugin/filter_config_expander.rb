@@ -32,6 +32,8 @@ class Fluent::Plugin::ConfigExpanderFilter < Fluent::Plugin::Filter
     super
 
     ex = expand_config(@config_config.corresponding_config_element)
+    log.debug "[#{self.class.name}] expand config: \n" + ex.to_s
+
     type = ex['@type']
     @plugin = Fluent::Plugin.new_input(type)
     @plugin.context_router = self.event_emitter_router(conf['@label'])
