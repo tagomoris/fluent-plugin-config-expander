@@ -20,8 +20,16 @@ module Fluent::Config::Expander
 
         vname = '__' + vkey + '__'
         vname2 = '${' + vkey + '}'
-        vargs.each do |v|
-          expanded = expand(e, mapping.merge({vname => v, vname2 => v}))
+        vargs.each do |vary|
+          # no indexed vname implicitly indicate a first element
+          vfirst = vary.split(',').first
+          vmaps = {vname => vfirst, vname2 => vfirst}
+
+          indexed_vmaps = vary.split(',').map.with_index {|v, i|
+            {"__#{vkey}[#{i}]__" => v, "${#{vkey}[#{i}]}" => v}
+          }.reduce({}){|memo, item| memo.merge(item) }
+
+          expanded = expand(e, mapping.merge(vmaps).merge(indexed_vmaps))
           attrs.update(expanded)
           elements += expanded.elements.map{|xe| expand(xe, mapping)}
         end

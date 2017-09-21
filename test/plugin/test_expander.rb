@@ -193,5 +193,72 @@ EOL
 </config>
 EOL
     assert_equal exconf4, @m.expand(conf4, {}).to_s
+
+    nonexconf5 = <<EOL
+<config>
+  type forward
+  flush_interval 1s
+  <for pair in 01,24221 02,24222>
+    <server>
+      host node__pair[0]__.local
+      port __pair[1]__
+    </server>
+  </for>
+</config>
+EOL
+    conf5 = Fluent::Config.parse(nonexconf5, 'hoge').elements.first
+    assert_equal nonexconf5, conf5.to_s
+    exconf5 = <<EOL
+<config>
+  type forward
+  flush_interval 1s
+  <server>
+    host node01.local
+    port 24221
+  </server>
+  <server>
+    host node02.local
+    port 24222
+  </server>
+</config>
+EOL
+    assert_equal exconf5, @m.expand(conf5, {}).to_s
+
+    nonexconf6 = <<EOL
+<config>
+  type forward
+  flush_interval 1s
+  <for pair in 01,24221>
+    <server>
+      host node__pair[0]__.local
+      port ${pair[1]}
+    </server>
+  </for>
+  <for pair in 02,24222>
+    <server>
+      host node${pair[0]}.local
+      port __pair[1]__
+    </server>
+  </for>
+</config>
+EOL
+    conf6 = Fluent::Config.parse(nonexconf6, 'hoge').elements.first
+    assert_equal nonexconf6, conf6.to_s
+    exconf6 = <<EOL
+<config>
+  type forward
+  flush_interval 1s
+  <server>
+    host node01.local
+    port 24221
+  </server>
+  <server>
+    host node02.local
+    port 24222
+  </server>
+</config>
+EOL
+    assert_equal exconf6, @m.expand(conf6, {}).to_s
+
   end
 end
