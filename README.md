@@ -101,6 +101,22 @@ Set hostname into tag in 'tail' input plugin:
       </config>
     </source>
 
+Also you can give comma-separated multi values(note no indexed name `${varname}` indice a first element):
+
+    <match example.**>
+      @type config_expander
+      <config>
+        @type forward
+        flush_interval 30s
+        <for nodeinfo in 01,24224 02,24225>
+          <server>
+            host worker${nodeinfo[0]}.local
+            port ${nodeinfo[1]}
+          </server>
+        </for>
+      </config>
+    </match>
+
 ## TODO
 
 * more tests
